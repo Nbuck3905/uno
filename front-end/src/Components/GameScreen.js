@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import cards from "../cards";
 import UnoCard from "./UnoCard";
+import GamePlay from './GamePlay'
 import { io } from '../Socket'
 
 export default class GameScreen extends Component {
@@ -12,7 +13,8 @@ export default class GameScreen extends Component {
     player: {
       user: {},
       cards: []
-    }
+    },
+    deal: false
   };
 
   componentDidMount() {
@@ -26,6 +28,7 @@ export default class GameScreen extends Component {
       }
     });
     this.getCreator(this.props.game.creator_id)
+    io.on('dealt', () => this.setState({ deal: true }))
   }
   
   getCreator = (id) => {
@@ -37,7 +40,18 @@ export default class GameScreen extends Component {
     })
   }
 
+  handleDeal = () => {
+    io.emit('deal')
+  }
+
   render() {
+    if(this.state.deal){
+      return(
+        <div className="ui raised very padded text container segment form">
+          <GamePlay/>
+        </div>
+      )
+    }
     return (
       <div className="ui raised very padded text container segment form">
         {this.state.game ? 
@@ -50,7 +64,7 @@ export default class GameScreen extends Component {
         {this.state.players.map(player => {
           return <h3>{player.username}</h3>
         })}
-        {this.props.user.id == this.state.creator.id ? <div className='ui massive green button'>Deal</div>}
+        {this.props.user.id == this.state.creator.id ? <div className='ui massive green button' onClick={this.handleDeal}>Deal</div> : null}
       </div>
     );
   }
