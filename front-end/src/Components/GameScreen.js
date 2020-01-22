@@ -45,8 +45,12 @@ export default class GameScreen extends Component {
       console.log(randomNumber);
       let drawnCard = this.state.drawCards[randomNumber];
       this.state.player.cards.push(drawnCard);
-      this.setState({
-        drawCards: this.state.drawCards.filter(card => card != drawnCard)
+
+      io.emit("card.drawn", drawnCard);
+      io.on("remove.card", drawnCard => {
+        this.setState({
+          drawCards: this.state.drawCards.filter(card => card != drawnCard)
+        });
       });
       x = x + 1;
     }

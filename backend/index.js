@@ -1,61 +1,77 @@
-const databaseSettings = require('./knexfile.js').development
-const knex = require('knex')(databaseSettings)
-const express = require('express')
-const bodyParser = require('body-parser')
-const cors  = require('cors')
-const app = express()
-const jwt = require('jsonwebtoken')
-const http = require('http').createServer(app)
-const io = require('socket.io')(http); // <-- Web Socket Server
+const databaseSettings = require("./knexfile.js").development;
+const knex = require("knex")(databaseSettings);
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const app = express();
+const jwt = require("jsonwebtoken");
+const http = require("http").createServer(app);
+const io = require("socket.io")(http); // <-- Web Socket Server
 
-io.on('connection', async (socket) => {
-    socket.on('games.get', async () => {
-        let games = await knex('games').select()
-        io.emit('games', games)
-    })
-    socket.on('game.create', async game => {
-        await knex('games').insert(game)
-        let games = await knex('games').select()
-        io.emit('game.created', games)
-    })
-    socket.on('game.join', async game => {
-        await knex('games').where({id: game.id}).update(game)
-        io.emit('game.joined', game)
-    })
-    socket.on('player.get', async (player_id) => {
-        let player = await knex('users').where({id: player_id}).select()
-        io.emit('player', player)
-    })
-    socket.on('game.delete', async (game) => {
-        console.log('game.delete was emitted')
-        await knex('games').where({name: game.name}).del()
-        io.emit('game.deleted', game)
-    })
-    socket.on('game.leave', async (game) => {
-        console.log('game.leave was emitted')
-        await knex('games').where({id: game.game.id}).update({...game.game, users: JSON.stringify(JSON.parse(game.game.users).filter(id => id != game.user_id))})
-        io.emit('game.left', game.user_id)
-    })
-    socket.on('game.start', async (player_ids) => {
-        let players = await Promise.all(player_ids.map(async (player_id) => {
-            let player = await knex('users').where({id: player_id}).select()
-            return player[0]
-        }))
-        io.emit('game.started', players)
-    })
-    socket.on('creator.get', async (id) => {
-        let creator = await knex('users').where({id: id}).select()
-        io.emit('creator.send', creator[0])
-    })
-    socket.on('deal', () => io.emit('dealt'))
-})
+io.on("connection", async socket => {
+  socket.on("games.get", async () => {
+    let games = await knex("games").select();
+    io.emit("games", games);
+  });
+  socket.on("game.create", async game => {
+    await knex("games").insert(game);
+    let games = await knex("games").select();
+    io.emit("game.created", games);
+  });
+  socket.on("game.join", async game => {
+    await knex("games")
+      .where({ id: game.id })
+      .update(game);
+    io.emit("game.joined", game);
+  });
+  socket.on("player.get", async player_id => {
+    let player = await knex("users")
+      .where({ id: player_id })
+      .select();
+    io.emit("player", player);
+  });
+  socket.on("game.delete", async game => {
+    console.log("game.delete was emitted");
+    await knex("games")
+      .where({ name: game.name })
+      .del();
+    io.emit("game.deleted", game);
+  });
+  socket.on("game.leave", async game => {
+    console.log("game.leave was emitted");
+    await knex("games")
+      .where({ id: game.game.id })
+      .update({
+        ...game.game,
+        users: JSON.stringify(
+          JSON.parse(game.game.users).filter(id => id != game.user_id)
+        )
+      });
+    io.emit("game.left", game.user_id);
+  });
+  socket.on("game.start", async player_ids => {
+    let players = await Promise.all(
+      player_ids.map(async player_id => {
+        let player = await knex("users")
+          .where({ id: player_id })
+          .select();
+        return player[0];
+      })
+    );
+    io.emit("game.started", players);
+  });
+  socket.on("creator.get", async id => {
+    let creator = await knex("users")
+      .where({ id: id })
+      .select();
+    io.emit("creator.send", creator[0]);
+  });
+  socket.on("deal", () => io.emit("dealt"));
+  socket.on("card.drawn", card => io.emit("remove.card", card));
+});
 
-
-
-
-app.use(bodyParser.json())
-app.use(cors())
-
+app.use(bodyParser.json());
+app.use(cors());
 
 /////// users
 
