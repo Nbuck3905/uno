@@ -50,6 +50,7 @@ export default class GameScreen extends Component {
         {this.state.players.map(player => {
           return <h3>{player.username}</h3>
         })}
+        {this.props.user.id == this.state.creator.id ? <div className='ui massive green button'>Deal</div>}
       </div>
     );
   }
