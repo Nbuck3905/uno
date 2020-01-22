@@ -6,52 +6,22 @@ exports.seed = async function(knex) {
   await knex('games').insert([
     {
       name: 'one', 
-      users: [
-        {
-          id: 1,
-          username: 'jobu',
-          password: '1'
-        },
-        {
-          id: 2,
-          username: 'nbuch',
-          password: '1'
-        }
-      ],
-      size: 2,
+      creator_id: 1,
+      users: JSON.stringify([2, 3]),
+      size: 3,
       created_at: new Date  
     },
     {
-      name: 'two', 
-      users: [
-        {
-          id: 1,
-          username: 'jobu',
-          password: '1'
-        },
-        {
-          id: 2,
-          username: 'nbuch',
-          password: '1'
-        }
-      ],
-      size: 2,
+      name: 'two',
+      creator_id: 1, 
+      users: JSON.stringify([2]),
+      size: 3,
       created_at: new Date 
     },
     {
-      name: 'three', 
-      users: [
-        {
-          id: 1,
-          username: 'jobu',
-          password: '1'
-        },
-        {
-          id: 2,
-          username: 'nbuch',
-          password: '1'
-        }
-      ],
+      name: 'three',
+      creator_id: 1,
+      users: JSON.stringify([2]),
       size: 2,
       created_at: new Date 
     },
