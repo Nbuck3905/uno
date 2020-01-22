@@ -180,8 +180,15 @@
 .card.symbol-reverse:after {
   content: "reverse";
 }
-
+.card.symbol-0 .mark:after,
+.card.symbol-1 .mark:after,
+.card.symbol-2 .mark:after,
+.card.symbol-3 .mark:after,
+.card.symbol-4 .mark:after,
+.card.symbol-5 .mark:after,
 .card.symbol-6 .mark:after,
+.card.symbol-7 .mark:after,
+.card.symbol-8 .mark:after,
 .card.symbol-9 .mark:after {
   display: block;
   content: "";
@@ -193,19 +200,51 @@
   height: 4px;
   box-shadow: 1px 1px 0 #000000;
 }
+.card.symbol-0.blue .mark:after,
+.card.symbol-1.blue .mark:after,
+.card.symbol-2.blue .mark:after,
+.card.symbol-3.blue .mark:after,
+.card.symbol-4.blue .mark:after,
+.card.symbol-5.blue .mark:after,
 .card.symbol-6.blue .mark:after,
+.card.symbol-7.blue .mark:after,
+.card.symbol-8.blue .mark:after,
 .card.symbol-9.blue .mark:after {
   background: #0063b3;
 }
+.card.symbol-0.green .mark:after,
+.card.symbol-1.green .mark:after,
+.card.symbol-2.green .mark:after,
+.card.symbol-3.green .mark:after,
+.card.symbol-4.green .mark:after,
+.card.symbol-5.green .mark:after,
 .card.symbol-6.green .mark:after,
+.card.symbol-7.green .mark:after,
+.card.symbol-8.green .mark:after,
 .card.symbol-9.green .mark:after {
   background: #18a849;
 }
+.card.symbol-0.red .mark:after,
+.card.symbol-1.red .mark:after,
+.card.symbol-2.red .mark:after,
+.card.symbol-3.red .mark:after,
+.card.symbol-4.red .mark:after,
+.card.symbol-5.red .mark:after,
 .card.symbol-6.red .mark:after,
+.card.symbol-7.red .mark:after,
+.card.symbol-8.red .mark:after,
 .card.symbol-9.red .mark:after {
   background: #c72a18;
 }
+.card.symbol-0.yellow .mark:after,
+.card.symbol-1.yellow .mark:after,
+.card.symbol-2.yellow .mark:after,
+.card.symbol-3.yellow .mark:after,
+.card.symbol-4.yellow .mark:after,
+.card.symbol-5.yellow .mark:after,
 .card.symbol-6.yellow .mark:after,
+.card.symbol-7.yellow .mark:after,
+.card.symbol-8.yellow .mark:after,
 .card.symbol-9.yellow .mark:after {
   background: #e6ca1e;
 }
