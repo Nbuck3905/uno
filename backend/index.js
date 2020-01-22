@@ -47,7 +47,9 @@ io.on('connection', async (socket) => {
         let creator = await knex('users').where({id: id}).select()
         io.emit('creator.send', creator[0])
     })
+    socket.on('card.drawn', (cards) => io.emit('new.drawCards', cards))
     socket.on('deal', () => io.emit('dealt'))
+    socket.on('next.deal', (player) => io.emit('next.dealt', player))
 })
 
 
