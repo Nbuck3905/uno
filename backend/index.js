@@ -56,151 +56,175 @@ app.use(bodyParser.json())
 app.use(cors())
 
 
-
 /////// users
 
-app.get('/users', (req, res) => {
-    async function getUsers(){
-        let users = await knex('users').select() //.join('hands', 'users.id', '=', 'hands.user_id')
-        res.json(users)
+app.get("/users", (req, res) => {
+  async function getUsers() {
+    let users = await knex("users").select(); //.join('hands', 'users.id', '=', 'hands.user_id')
+    res.json(users);
+  }
+  getUsers();
+});
+
+app.post("/user/login", (req, res) => {
+  async function getUser() {
+    let userArray = await knex("users")
+      .where({ username: req.body.username })
+      .select();
+    console.log(userArray);
+    if (userArray[0] !== undefined) {
+      if (userArray[0].password === req.body.password) {
+        let user = userArray[0];
+        token = await jwt.sign(
+          { user },
+          "Uno translates from spanish to one in English"
+        );
+        return res.json({ user: user, token: token });
+      }
     }
-    getUsers()
-})
+    return res.json({
+      error: true,
+      message: "Username/password combination invalid."
+    });
+  }
+  getUser();
+});
 
-app.post('/user/login', (req, res) => {
-    async function getUser(){
-        let userArray = await knex('users').where({username: req.body.username}).select()
-        if(userArray[0].password === req.body.password){
-            let user = userArray[0]
-            token = await jwt.sign({user}, 'Uno translates from spanish to one in English')
-            return res.json({user: user, token: token})
-        }
-        return res.json({error: true, message: 'Username/password combination invalid.'})
+app.post("/users", (req, res) => {
+  async function postUser() {
+    let existingUser = await knex("users")
+      .where({ username: req.body.username })
+      .select();
+    if (existingUser.length > 0) {
+      return res.json({ error: true, message: "Username already exists" });
     }
-    getUser()
-})
+    let user = await knex("users").insert(req.body);
+    let newUser = user[0];
+    token = await jwt.sign(
+      { ...req.body, id: newUser },
+      "Uno translates from spanish to one in English"
+    );
+    return res.json({ user: { ...req.body, id: newUser }, token: token });
+  }
+  postUser();
+});
 
-app.post('/users', (req, res) => {
-    async function postUser(){
-        let existingUser = await knex('users').where({username: req.body.username}).select()
-        if(existingUser.length > 0){
-            return res.json({error: true, message: 'Username already exists'})
-        }
-        let user = await knex('users').insert(req.body)
-        let newUser = user[0]
-        token = await jwt.sign({...req.body, id: newUser}, 'Uno translates from spanish to one in English')
-        return res.json({user: {...req.body, id: newUser}, token: token})
+app.get("/user", verifyToken, (req, res) => {
+  jwt.verify(
+    req.token,
+    "Uno translates from spanish to one in English",
+    (error, authData) => {
+      if (error) {
+        res.send("No logged in user");
+      } else {
+        res.json(authData);
+      }
     }
-    postUser()
-})
+  );
+});
 
+app.patch("/users/:id", (req, res) => {
+  async function patchUser() {
+    let user = await knex("users")
+      .where({ id: req.params.id })
+      .update(req.body);
+    res.send(user.json());
+  }
+  patchUser();
+});
 
-app.get('/user', verifyToken, (req, res) => {
-    jwt.verify(req.token, 'Uno translates from spanish to one in English', (error, authData) => {
-        if(error){
-            res.send('No logged in user')
-        } else {
-            res.json(authData)
-        }
-    })
-})
-
-
-
-app.patch('/users/:id', (req, res) => {
-    async function patchUser(){
-        let user = await knex('users').where({id: req.params.id}).update(req.body)
-        res.send(user.json())
-    }
-    patchUser()
-})
-
-app.delete('/users/:id', (req, res) => {
-    async function deleteUser(){
-        let user = await knex('users').where({id: req.params.id}).del()
-        res.send(console.log(`${user} deleted`))
-    }
-    deleteUser()
-})
-
-
+app.delete("/users/:id", (req, res) => {
+  async function deleteUser() {
+    let user = await knex("users")
+      .where({ id: req.params.id })
+      .del();
+    res.send(console.log(`${user} deleted`));
+  }
+  deleteUser();
+});
 
 ////// hands
 
-app.get('/hands', (req, res) => {
-    async function getHands(){
-        let hands = await knex('hands').select()
-        res.send(hands)
-    }
-    getHands()
-})
+app.get("/hands", (req, res) => {
+  async function getHands() {
+    let hands = await knex("hands").select();
+    res.send(hands);
+  }
+  getHands();
+});
 
-app.get('/hands/:id', (req, res) => {
-    async function getHand(){
-        let hand = await knex('hands').where({id: req.params.id}).select()
-        res.send(hand)
-    }
-    getHand()
-})
+app.get("/hands/:id", (req, res) => {
+  async function getHand() {
+    let hand = await knex("hands")
+      .where({ id: req.params.id })
+      .select();
+    res.send(hand);
+  }
+  getHand();
+});
 
-app.post('/hands', (req, res) => {
-    async function postHand(){
-        let hand = await knex('hands').insert(req.body)
-        res.send(JSON.stringify(hand.json()))
-    }
-    postHand()
-})
-
-
+app.post("/hands", (req, res) => {
+  async function postHand() {
+    let hand = await knex("hands").insert(req.body);
+    res.send(JSON.stringify(hand.json()));
+  }
+  postHand();
+});
 
 ////// games
 
-app.get('/games', (req, res) => {
-    async function getGames(){
-        let games = await knex('games').select()
-        res.send(games)
-    }
-    getGames()
-})
+app.get("/games", (req, res) => {
+  async function getGames() {
+    let games = await knex("games").select();
+    res.send(games);
+  }
+  getGames();
+});
 
-app.get('/games/:id', (req, res) => {
-    async function getGame(){
-        let game = await knex('games').where({id: req.params.id}).select()
-        res.send(game)
-    }
-    getGame()
-})
+app.get("/games/:id", (req, res) => {
+  async function getGame() {
+    let game = await knex("games")
+      .where({ id: req.params.id })
+      .select();
+    res.send(game);
+  }
+  getGame();
+});
 
-app.post('/games', (req, res) => {
-    async function postGame(){
-        let game = await knex('games').insert(req.body)
-        res.json({game: {...req.body, id: game}})
-    }
-    postGame()
-})
+app.post("/games", (req, res) => {
+  async function postGame() {
+    let game = await knex("games").insert(req.body);
+    res.json({ game: { ...req.body, id: game } });
+  }
+  postGame();
+});
 
-app.patch('/games/:id', (req, res) => {
-    async function patchGame(){
-        let game = await knex('games').where({id: req.params.id}).update(req.body)
-        res.send(game.json())
-    }
-    patchGame()
-})
+app.patch("/games/:id", (req, res) => {
+  async function patchGame() {
+    let game = await knex("games")
+      .where({ id: req.params.id })
+      .update(req.body);
+    res.send(game.json());
+  }
+  patchGame();
+});
 
-app.delete('/games/:id', (req, res) => {
-    async function deleteGame(){
-        let game = await knex('games').where({id: req.params.id}).del()
-        res.send(console.log(`${game} deleted`))
-    }
-    deleteGame()
-})
+app.delete("/games/:id", (req, res) => {
+  async function deleteGame() {
+    let game = await knex("games")
+      .where({ id: req.params.id })
+      .del();
+    res.send(console.log(`${game} deleted`));
+  }
+  deleteGame();
+});
 
-function verifyToken(req, res, next){
-    const [ method, token ] = req.headers.authorization.split(' ')
-    if(method !== undefined){
-        req.token = token
-        next()
-    }
+function verifyToken(req, res, next) {
+  const [method, token] = req.headers.authorization.split(" ");
+  if (method !== undefined) {
+    req.token = token;
+    next();
+  }
 }
 
-http.listen(3001)
+http.listen(3001);
