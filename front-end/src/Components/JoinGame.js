@@ -16,7 +16,6 @@ export default class JoinGame extends React.Component{
     }
 
     render(){
-        console.log(this.state.games)
         return(
             <div className="ui raised very padded text container segment form">
                 <h1>Join Game</h1>

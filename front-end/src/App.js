@@ -10,10 +10,11 @@ import CreateGame from "./Components/CreateGame"
 import JoinGame from "./Components/JoinGame"
 import Waiting from "./Components/Waiting"
 import { io } from './Socket'
+import GameScreen from './Components/GameScreen'
+import PlayNavBar from './Components/PlayNavBar'
 
 export default class App extends Component {
   state = {
-    cards: [],
     loggedInUser: null,
     showPage: 'logIn',
     showUserPage: 'home',
@@ -87,7 +88,6 @@ export default class App extends Component {
   }
 
   handleLeave = (game) => {
-    console.log(game)
     if(game.creator_id == this.state.loggedInUser.id){
       console.log('creator left game')
       this.setState({showUserPage: 'home'})
@@ -179,6 +179,23 @@ export default class App extends Component {
               user={this.state.loggedInUser}
               handleLeave={this.handleLeave}
               handleHome={this.handleHome}
+              game={this.state.currentGame}
+            />
+          </div>
+        )
+      }
+      if(this.state.showUserPage === 'play'){
+        return(
+          <div style={{background: 'black', height: '700vh'}}>
+            <PlayNavBar
+              user={this.state.loggedInUser}
+              game={this.state.currentGame}
+            />
+            <GameScreen
+              user={this.state.loggedInUser}
+              handleLeave={this.handleLeave}
+              handleHome={this.handleHome}
+              game={this.state.currentGame}
             />
           </div>
         )
