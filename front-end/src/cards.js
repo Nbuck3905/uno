@@ -1,4 +1,4 @@
-cards = [
+const cards = [
   {
     id: 1,
     type: "0",
@@ -322,42 +322,42 @@ cards = [
   {
     id: 65,
     type: "wild",
-    color: "wild"
+    color: "darkgray"
   },
   {
     id: 66,
     type: "wild",
-    color: "wild"
+    color: "darkgray"
   },
   {
     id: 67,
     type: "wild",
-    color: "wild"
+    color: "darkgray"
   },
   {
     id: 68,
     type: "wild",
-    color: "wild"
+    color: "darkgray"
   },
   {
     id: 69,
-    type: "wild +4",
-    color: "wild"
+    type: "+4",
+    color: "darkgray"
   },
   {
     id: 70,
-    type: "wild +4",
-    color: "wild"
+    type: "+4",
+    color: "darkgray"
   },
   {
     id: 71,
-    type: "wild +4",
-    color: "wild"
+    type: "+4",
+    color: "darkgray"
   },
   {
     id: 72,
-    type: "wild +4",
-    color: "wild"
+    type: "+4",
+    color: "darkgray"
   },
   {
     id: 73,
@@ -540,3 +540,5 @@ cards = [
     color: "blue"
   }
 ];
+
+export default cards;

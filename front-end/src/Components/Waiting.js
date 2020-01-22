@@ -19,11 +19,12 @@ export default class Waiting extends React.Component{
     }
 
     render(){
+        console.log(this.props.game)
         return(
             <div className="ui raised very padded text container segment form">
-                <h1>Game: {this.state.game.name}</h1>
+                <h1>Game: {this.props.game.name}</h1>
                 <h3>Players Joined: {this.state.player_ids.length + 1}</h3>
-                <h3>Waiting On: {this.state.game.size - (this.state.player_ids.length + 1)}</h3>
+                <h3>Waiting On: {this.props.game.size - (this.state.player_ids.length + 1)}</h3>
                 {this.props.user.id == this.state.game.creator_id ? <div className='ui massive fluid green button'>Start</div> : null}
             </div>
         )
