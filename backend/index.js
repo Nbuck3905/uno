@@ -70,6 +70,7 @@ io.on("connection", async socket => {
   socket.on("card.drawn", card => io.emit("remove.card", card));
 });
 
+
 app.use(bodyParser.json());
 app.use(cors());
 

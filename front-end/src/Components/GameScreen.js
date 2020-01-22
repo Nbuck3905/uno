@@ -15,7 +15,8 @@ export default class GameScreen extends Component {
       cards: []
     },
     deal: false,
-    drawCards: []
+    drawCards: [],
+    turn: null
   };
 
   componentDidMount() {
@@ -27,34 +28,47 @@ export default class GameScreen extends Component {
         user: this.props.user,
         cards: []
       },
-      drawCards: cards
+      drawCards: cards,
     });
     this.getCreator(this.props.game.creator_id);
+    io.on('new.drawCards', (cards) => this.setState({drawCards: cards}))
     io.on("dealt", () => {
       this.setState({ deal: true });
       this.deal();
     });
+    io.on('next.dealt', ({ id }) => {
+      let player = this.state.players.find(player => player.id === id)
+      if( this.state.players.indexOf(player) + 2 <= this.state.players.length){
+        this.setState({
+          turn: this.state.players[this.state.players.indexOf(player) + 1]
+        }, () => this.deal())
+        
+      }
+    })
   }
 
   deal = () => {
-    let x = 0;
-    while (x < 7) {
-      let randomNumber = Math.floor(
-        Math.random() * this.state.drawCards.length
-      );
-      console.log(randomNumber);
-      let drawnCard = this.state.drawCards[randomNumber];
-      this.state.player.cards.push(drawnCard);
-
-      io.emit("card.drawn", drawnCard);
-      io.on("remove.card", drawnCard => {
-        this.setState({
-          drawCards: this.state.drawCards.filter(card => card != drawnCard)
-        });
-      });
-      x = x + 1;
+  
+    if(this.state.player.user.id == this.state.turn.id){
+      let x = 0;
+      let drawCards = this.state.drawCards
+      while (x < 7) {
+        console.log(drawCards.length)
+        let randomNumber = Math.floor(
+          Math.random() * drawCards.length
+        );
+        console.log(randomNumber);
+        let drawnCard = drawCards[randomNumber];
+        this.state.player.cards.push(drawnCard);
+        
+        drawCards = drawCards.filter(card => card != drawnCard)
+        
+        x = x + 1;
+      }
+      this.setState({ drawCards })
+      io.emit('card.drawn', drawCards)
+      io.emit('next.deal', this.state.turn);
     }
-    console.log(this.state.drawCards);
   };
 
   getCreator = id => {
@@ -62,7 +76,8 @@ export default class GameScreen extends Component {
     io.on("creator.send", creator => {
       this.setState({
         players: [...this.props.players, creator],
-        creator: creator
+        creator: creator,
+        turn: this.state.players[0]
       });
     });
   };

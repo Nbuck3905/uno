@@ -6,7 +6,6 @@ import UnoBack from "./UnoBack";
 
 export default class GamePlay extends React.Component {
   render() {
-    console.log(this.props.drawCards);
     return (
       <div>
         <div
