@@ -3,25 +3,33 @@ import "./App.css";
 import NavBar from "./Components/NavBar";
 import UserNavBar from "./Components/UserNavBar"
 import WaitNavBar from "./Components/WaitNavBar"
+import PlayNavBar from './Components/PlayNavBar'
 import UserHome from "./Components/UserHome"
 import LogIn from "./Components/LogIn"
 import SignUp from "./Components/SignUp"
 import CreateGame from "./Components/CreateGame"
 import JoinGame from "./Components/JoinGame"
 import Waiting from "./Components/Waiting"
-import { io } from './Socket'
 import GameScreen from './Components/GameScreen'
-import PlayNavBar from './Components/PlayNavBar'
+import { io } from './Socket'
 
 export default class App extends Component {
   state = {
     loggedInUser: null,
     showPage: 'logIn',
     showUserPage: 'home',
-    currentGame: {}
+    currentGame: {},
+    creator: {},
+    players: []
   };
 
   componentDidMount() {
+    io.on('game.started', (players) => {
+      this.setState({
+        players: players,
+        showUserPage: 'play'
+      })
+    })
     fetch('http://localhost:3001/user', {
       headers: {
         Authorization: `Bearer ${localStorage.token}`
@@ -99,20 +107,40 @@ export default class App extends Component {
     }
   }
 
+  handleStart = (game, players) => {
+    this.setState({currentGame: game})
+    io.emit('game.start', players)
+  }
+
+  getCreator = (id) => {
+    io.emit('creator.get', id)
+    io.on('creator.send', (creator) => {
+      this.setState({
+        creator: creator
+      })
+    })
+  }
+
   render() {
     window.app = this
     if(this.state.showPage === 'logIn'){
       return(
         <div style={{background: 'black', height: '700vh'}}>
           <NavBar/>
-          <LogIn setLoggedInUser={this.setLoggedInUser} handleSignUp={this.handleSignUp}/>
+          <LogIn
+            setLoggedInUser={this.setLoggedInUser}
+            handleSignUp={this.handleSignUp}
+          />
         </div>
       )
     }
     if(this.state.showPage === 'signUp'){
       return(
         <div style={{background: 'black', height: '700vh'}}>
-          <NavBar  handleUno={this.handleUno} handleLeave={this.handleLeave}/>
+          <NavBar
+            handleUno={this.handleUno}
+            handleLeave={this.handleLeave}
+          />
           <SignUp setLoggedInUser={this.setLoggedInUser} />
         </div>
       )
@@ -180,6 +208,7 @@ export default class App extends Component {
               handleLeave={this.handleLeave}
               handleHome={this.handleHome}
               game={this.state.currentGame}
+              handleStart={this.handleStart}
             />
           </div>
         )
@@ -188,14 +217,14 @@ export default class App extends Component {
         return(
           <div style={{background: 'black', height: '700vh'}}>
             <PlayNavBar
-              user={this.state.loggedInUser}
               game={this.state.currentGame}
-            />
+              />
             <GameScreen
+              creator={this.state.creator}
+              players={this.state.players}
               user={this.state.loggedInUser}
-              handleLeave={this.handleLeave}
-              handleHome={this.handleHome}
               game={this.state.currentGame}
+              getCreator={this.getCreator}
             />
           </div>
         )
