@@ -33,9 +33,19 @@ io.on('connection', async (socket) => {
     })
     socket.on('game.leave', async (game) => {
         console.log('game.leave was emitted')
-        console.log(game)
         await knex('games').where({id: game.game.id}).update({...game.game, users: JSON.stringify(JSON.parse(game.game.users).filter(id => id != game.user_id))})
         io.emit('game.left', game.user_id)
+    })
+    socket.on('game.start', async (player_ids) => {
+        let players = await Promise.all(player_ids.map(async (player_id) => {
+            let player = await knex('users').where({id: player_id}).select()
+            return player[0]
+        }))
+        io.emit('game.started', players)
+    })
+    socket.on('creator.get', async (id) => {
+        let creator = await knex('users').where({id: id}).select()
+        io.emit('creator.send', creator[0])
     })
 })
 

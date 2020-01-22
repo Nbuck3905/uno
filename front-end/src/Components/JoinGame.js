@@ -33,7 +33,6 @@ export default class JoinGame extends React.Component{
                             </div>
                         )
                     }
-                    return () => this.props.handleCreateGame()
                 })}
             </div>
         )
