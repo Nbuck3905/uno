@@ -76,6 +76,7 @@ io.on("connection", async socket => {
   socket.on('draw2.play', (playedCard) => io.emit('draw2.played', playedCard))
   socket.on('draw4.play', (playedCard) => io.emit('draw4.played', playedCard))
   socket.on('wild.play', (playedCard) => io.emit('wild.played', playedCard))
+  socket.on("i.win", player => io.emit("winner", player));
 });
 
 

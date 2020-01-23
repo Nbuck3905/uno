@@ -126,6 +126,7 @@ export default class GameScreen extends Component {
         colorSelect: false
       }, () => this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null)
     })
+    io.on("winner", player => alert(`${player.username} wins`));
   }
 
   deal = () => {
@@ -261,8 +262,7 @@ export default class GameScreen extends Component {
   };
 
   winner = player => {
-    // What happens when you win?
-    console.log(`${player.username} wins`);
+   io.emit('i.win', player)
   };
 
   render() {
