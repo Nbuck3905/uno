@@ -30,20 +30,23 @@ export default class GameScreen extends Component {
         user: this.props.user,
         cards: []
       },
-      drawCards: cards,
+      drawCards: cards
     });
     this.getCreator(this.props.game.creator_id);
-    io.on('drawCards.new', (cards) => this.setState({drawCards: cards}))
+    io.on("drawCards.new", cards => this.setState({ drawCards: cards }));
     io.on("dealt", () => {
       this.setState({ deal: true });
       this.deal();
     });
-    io.on('next.dealt', ({ id }) => {
-      let player = this.state.players.find(player => player.id === id)
-      if( this.state.players.indexOf(player) + 2 <= this.state.players.length){
-        return this.setState({
-          turn: this.state.players[this.state.players.indexOf(player) + 1]
-        }, () => this.deal())
+    io.on("next.dealt", ({ id }) => {
+      let player = this.state.players.find(player => player.id === id);
+      if (this.state.players.indexOf(player) + 2 <= this.state.players.length) {
+        return this.setState(
+          {
+            turn: this.state.players[this.state.players.indexOf(player) + 1]
+          },
+          () => this.deal()
+        );
       }
       return this.setState({turn: this.state.players[0]})
     })
@@ -111,20 +114,20 @@ export default class GameScreen extends Component {
   }
 
   deal = () => {
-    if(this.state.player.user.id == this.state.turn.id){
+    if (this.state.player.user.id == this.state.turn.id) {
       let x = 0;
-      let drawCards = this.state.drawCards
+      let drawCards = this.state.drawCards;
       while (x < 7) {
         let randomNumber = Math.floor(Math.random() * drawCards.length);
         let drawnCard = drawCards[randomNumber];
 
         this.state.player.cards.push(drawnCard);
-        drawCards = drawCards.filter(card => card != drawnCard)
+        drawCards = drawCards.filter(card => card != drawnCard);
         x = x + 1;
       }
-      this.setState({ drawCards })
-      io.emit('cards.dealt', drawCards)
-      io.emit('next.deal', this.state.turn);
+      this.setState({ drawCards });
+      io.emit("cards.dealt", drawCards);
+      io.emit("next.deal", this.state.turn);
     }
   };
 
@@ -171,7 +174,7 @@ export default class GameScreen extends Component {
       this.setState({player: {...this.state.player, cards: [...this.state.player.cards, ...drawnCards]}})
       io.emit('draw', drawCards)
     }
-  }
+  };
 
   handlePlay = (playedCard) => {
     console.log(playedCard)
@@ -193,9 +196,10 @@ export default class GameScreen extends Component {
         }
         if(playedCard.type == 'skip'){
           return io.emit('skip.play', playedCard)
+
         }
-        if(playedCard.type == 'reverse'){
-          return io.emit('reverse.play', playedCard)
+        if (playedCard.type == "reverse") {
+          return io.emit("reverse.play", playedCard);
         }
         return io.emit('normal.play', playedCard)
       }
@@ -234,12 +238,12 @@ export default class GameScreen extends Component {
         }
       }
     }
-  }
+  };
 
-  winner = (player) => {
+  winner = player => {
     // What happens when you win?
-    console.log(`${player.username} wins`)
-  }
+    console.log(`${player.username} wins`);
+  };
 
   render() {
     if (this.state.deal) {
