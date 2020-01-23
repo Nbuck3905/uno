@@ -3,13 +3,13 @@ import { io } from "../Socket";
 import UnoCard from "./UnoCard";
 import "../UnoCard.css";
 import UnoBack from "./UnoBack";
-import ColorSelect from './ColorSelect'
+import ColorSelect from "./ColorSelect";
 
 export default class GamePlay extends React.Component {
   render() {
     return (
       <div>
-        <h1 style={{color: 'white'}}>Turn: {this.props.turn}</h1>
+        <h1 style={{ color: "white" }}>Turn: {this.props.turn}</h1>
         <div
           style={{
             display: "flex",
@@ -21,7 +21,11 @@ export default class GamePlay extends React.Component {
           <div onClick={this.props.handleDraw}>
             <UnoBack />
           </div>
-          {this.props.colorSelect ? <ColorSelect discard={this.state.discard}/> : <UnoCard {...this.props.discard}/>}
+          {this.props.colorSelect ? (
+            <ColorSelect discard={this.state.discard} />
+          ) : (
+            <UnoCard {...this.props.discard} />
+          )}
         </div>
         <div
           style={{
@@ -32,11 +36,11 @@ export default class GamePlay extends React.Component {
           }}
         >
           {this.props.cards.map(card => {
-            return(
+            return (
               <div key={card.id} onClick={() => this.props.handlePlay(card)}>
-                <UnoCard {...card}/>
+                <UnoCard {...card} />
               </div>
-            )
+            );
           })}
         </div>
       </div>
