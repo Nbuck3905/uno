@@ -247,7 +247,10 @@ export default class App extends Component {
       if (this.state.showUserPage === "play") {
         return (
           <div style={{ background: "black", height: "100vh" }}>
-            <PlayNavBar game={this.state.currentGame} />
+            <PlayNavBar 
+              game={this.state.currentGame}
+              user={this.state.loggedInUser}
+            />
             <GameScreen
               creator={this.state.creator}
               players={this.state.players}
