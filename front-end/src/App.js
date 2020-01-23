@@ -12,6 +12,7 @@ import JoinGame from "./Components/JoinGame";
 import Waiting from "./Components/Waiting";
 import GameScreen from "./Components/GameScreen";
 import { io } from "./Socket";
+const URLBase = 'http://10.185.2.163:3001'
 
 export default class App extends Component {
   state = {
@@ -30,7 +31,7 @@ export default class App extends Component {
         showUserPage: "play"
       });
     });
-    fetch("http://localhost:3001/user", {
+    fetch(`${URLBase}/user`, {
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       }
@@ -246,7 +247,7 @@ export default class App extends Component {
       }
       if (this.state.showUserPage === "play") {
         return (
-          <div style={{ background: "black", height: "100vh" }}>
+          <div style={{ background: "black", height: "1000vh" }}>
             <PlayNavBar 
               game={this.state.currentGame}
               user={this.state.loggedInUser}

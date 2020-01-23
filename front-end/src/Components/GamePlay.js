@@ -23,13 +23,13 @@ export default class GamePlay extends React.Component {
           </div>
             <UnoCard {...this.props.discard}/> 
         </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-end",
-            height: "40vh"
-          }}
+        <div className='ui cards' style={{justifyContent: 'center'}}
+          // style={{
+          //   display: "flex",
+          //   justifyContent: "center",
+          //   alignItems: "flex-end",
+          //   height: "40vh"
+          // }}
         >
           {this.props.cards.map(card => {
             return(

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+const URLBase = 'http://10.185.2.163:3001'
 
 class LogIn extends Component {
   state = {
@@ -21,7 +22,7 @@ class LogIn extends Component {
 
   handleLogIn = e => {
     e.preventDefault();
-    fetch("http://localhost:3001/user/login", {
+    fetch(`${URLBase}/user/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
