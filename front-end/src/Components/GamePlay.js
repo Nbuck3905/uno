@@ -21,7 +21,7 @@ export default class GamePlay extends React.Component {
           <div onClick={this.props.handleDraw}>
             <UnoBack />
           </div>
-          {this.props.colorSelect ? <ColorSelect discard={this.state.discard}/> : <UnoCard {...this.props.discard}/>}
+            <UnoCard {...this.props.discard}/> 
         </div>
         <div
           style={{
