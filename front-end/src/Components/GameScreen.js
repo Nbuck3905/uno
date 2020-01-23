@@ -16,7 +16,9 @@ export default class GameScreen extends Component {
     deal: false,
     drawCards: [],
     turn: null,
-    discard: null
+    discard: null,
+    drawAmount: 0,
+    colorSelect: false
   };
 
   componentDidMount() {
@@ -45,17 +47,11 @@ export default class GameScreen extends Component {
       }
       return this.setState({turn: this.state.players[0]})
     })
-    io.on('first.card.played', (playedCard) => {
-      this.setState({
-        player: {...this.state.player, cards: this.state.player.cards.filter(card => card.id != playedCard.id)},
-        discard: playedCard,
-        turn: this.state.players[1]
-      }, () => this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null)
-    })
-    io.on('drew1', (cards) => {
+    io.on('drew', (cards) => {
       let player = this.state.players.find(player => player.id === this.state.turn.id)
       this.setState({
         drawCards: cards,
+        drawAmount: 0,
         turn: (this.state.players.indexOf(player) + 1 >= this.state.players.length ? this.state.players[0] : this.state.players[this.state.players.indexOf(player) + 1])
       })
     })
@@ -82,6 +78,34 @@ export default class GameScreen extends Component {
         discard: playedCard,
         turn: (this.state.players.indexOf(player) == 0 ? this.state.players[this.state.players.length -1] : this.state.players[this.state.players.indexOf(player) - 1]),
         players: this.state.players.reverse()
+      }, () => this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null)
+    })
+    io.on('draw2.played', (playedCard) => {
+      let player = this.state.players.find(player => player.id === this.state.turn.id)
+      this.setState({
+        player: {...this.state.player, cards: this.state.player.cards.filter(card => card.id != playedCard.id)},
+        discard: playedCard,
+        turn: (this.state.players.indexOf(player) + 1 >= this.state.players.length ? this.state.players[0] : this.state.players[this.state.players.indexOf(player) + 1]),
+        drawAmount: this.state.drawAmount + 2
+      }, () => this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null)
+    })
+    io.on('draw4.played', (playedCard) => {
+      let player = this.state.players.find(player => player.id === this.state.turn.id)
+      this.setState({
+        player: {...this.state.player, cards: this.state.player.cards.filter(card => card.id != playedCard.id)},
+        discard: playedCard,
+        turn: (this.state.players.indexOf(player) + 1 >= this.state.players.length ? this.state.players[0] : this.state.players[this.state.players.indexOf(player) + 1]),
+        drawAmount: this.state.drawAmount + 4,
+        colorSelect: false
+      }, () => this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null)
+    })
+    io.on('wild.played', (playedCard) => {
+      let player = this.state.players.find(player => player.id === this.state.turn.id)
+      this.setState({
+        player: {...this.state.player, cards: this.state.player.cards.filter(card => card.id != playedCard.id)},
+        discard: playedCard,
+        turn: (this.state.players.indexOf(player) + 1 >= this.state.players.length ? this.state.players[0] : this.state.players[this.state.players.indexOf(player) + 1]),
+        colorSelect: false
       }, () => this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null)
     })
   }
@@ -119,48 +143,95 @@ export default class GameScreen extends Component {
     io.emit("deal");
   };
 
-  handleDrawOne = () => {
+  handleDraw = () => {
     if(this.state.player.user.id === this.state.turn.id){
+      if(this.state.drawAmount == 0){
+        let drawCards = this.state.drawCards
+        
+        let randomNumber = Math.floor(Math.random() * drawCards.length);
+        let drawnCard = drawCards[randomNumber];
+        drawCards = drawCards.filter(card => card.id != drawnCard.id)
+        
+        this.setState({player: {...this.state.player, cards: [...this.state.player.cards, drawnCard]}})
+        return io.emit('draw', drawCards)
+      }
+      
+      let drawAmount = this.state.drawAmount
       let drawCards = this.state.drawCards
-      let randomNumber = Math.floor(Math.random() * drawCards.length);
+      let drawnCards = []
 
-      let drawnCard = drawCards[randomNumber];
-      drawCards = drawCards.filter(card => card.id != drawnCard.id)
+      while(drawAmount > 0){
+        let randomNumber = Math.floor(Math.random() * drawCards.length);
+        let drawnCard = drawCards[randomNumber];
+        drawCards = drawCards.filter(card => card.id != drawnCard.id)
+        drawnCards.push(drawnCard)
 
-      this.setState({player: {...this.state.player, cards: [...this.state.player.cards, drawnCard]}})
-      io.emit('draw1', drawCards)
+        drawAmount = drawAmount - 1
+      }
+      this.setState({player: {...this.state.player, cards: [...this.state.player.cards, ...drawnCards]}})
+      io.emit('draw', drawCards)
     }
   }
 
   handlePlay = (playedCard) => {
     console.log(playedCard)
+    let drawAmount = this.state.drawAmount
     if(this.state.player.user.id === this.state.turn.id){
-      if(playedCard.color == 'darkgray'){
+      if(!this.state.discard){
         if(playedCard.type == 'wild'){
-          //player selects color
-          //return io.emit('wild.play', [playedCard, color])
+          //color selector
+          //playedCard.color = selected color
+          return io.emit('wild.play', playedCard)
         }
         if(playedCard.type == '+4'){
-          //player selects color
-          //next player can draw 4 cards, play draw 4 or draw 2 of selected color
-          //return io.emit('draw4.play', [playedCard, color])
+          //color selector
+          //playedCard.color = selected color
+          return io.emit('draw4.play', playedCard)
         }
-      }
-      if(!this.state.discard){
-        return io.emit('first.card.play', playedCard)
-      }
-      if(playedCard.type == this.state.discard.type || playedCard.color == this.state.discard.color){
+        if(playedCard.type == '+2'){
+          return io.emit('draw2.play', playedCard)
+        }
         if(playedCard.type == 'skip'){
           return io.emit('skip.play', playedCard)
         }
         if(playedCard.type == 'reverse'){
           return io.emit('reverse.play', playedCard)
         }
-        if(playedCard.type == '+2'){
-          //next player can draw 2 or play +2 or +4
-          //return io.emit('draw2.play, playedCard)
-        }
         return io.emit('normal.play', playedCard)
+      }
+      if(drawAmount == 0){
+        if(playedCard.type == 'wild'){
+          //color selector
+          //playedCard.color = selected color
+          return io.emit('wild.play', playedCard)
+        }
+        if(playedCard.type == '+4'){
+          //color selector
+          //playedCard.color = selected color
+          return io.emit('draw4.play', playedCard)
+        }
+        if((playedCard.type == this.state.discard.type) || (playedCard.color == this.state.discard.color)){
+          if(playedCard.type == '+2'){
+            return io.emit('draw2.play', playedCard)
+          }
+          if(playedCard.type == 'skip'){
+            return io.emit('skip.play', playedCard)
+          }
+          if(playedCard.type == 'reverse'){
+            return io.emit('reverse.play', playedCard)
+          }
+          return io.emit('normal.play', playedCard)
+        }
+      }
+      if(playedCard.type == this.state.discard.type){
+        if(playedCard.type == '+4'){
+          //color selector
+          //playedCard.color = selected color
+          return io.emit('draw4.play', playedCard)
+        }
+        if(playedCard.type == '+2'){
+          return io.emit('draw2.play', playedCard)
+        }
       }
     }
   }
@@ -173,14 +244,17 @@ export default class GameScreen extends Component {
   render() {
     if (this.state.deal) {
       return (
-        <GamePlay
-          drawCards={this.state.drawCards}
-          cards={this.state.player.cards}
-          turn={this.state.turn.username}
-          handlePlay={this.handlePlay}
-          discard={this.state.discard}
-          handleDrawOne={this.handleDrawOne}
-        />
+        <div>
+          <GamePlay
+            drawCards={this.state.drawCards}
+            cards={this.state.player.cards}
+            turn={this.state.turn.username}
+            handlePlay={this.handlePlay}
+            discard={this.state.discard}
+            handleDraw={this.handleDraw}
+            colorSelect={this.state.colorSelect}
+          />
+        </div>
       );
     }
     return (
