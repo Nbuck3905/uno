@@ -1,5 +1,5 @@
 import React from "react";
-const URLBase = 'http://10.185.2.163:3001'
+import { URLBase } from '../URLBase'
 
 export default class SignUp extends React.Component {
   state = {

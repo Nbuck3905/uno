@@ -67,7 +67,7 @@ io.on("connection", async socket => {
     io.emit("creator.send", creator[0]);
   });
   socket.on("deal", () => io.emit("dealt"));
-  socket.on("cards.dealt", cards => io.emit("drawCards.new", cards));
+  socket.on("cards.dealt", (cards) => io.emit("drawCards.new", cards));
   socket.on('next.deal', (player) => io.emit('next.dealt', player))
   socket.on('draw', (drawCards) => io.emit('drew', drawCards))
   socket.on('normal.play', (playedCard) => io.emit('normal.played', playedCard))
@@ -76,7 +76,8 @@ io.on("connection", async socket => {
   socket.on('draw2.play', (playedCard) => io.emit('draw2.played', playedCard))
   socket.on('draw4.play', (playedCard) => io.emit('draw4.played', playedCard))
   socket.on('wild.play', (playedCard) => io.emit('wild.played', playedCard))
-  socket.on("i.win", player => io.emit("winner", player));
+  socket.on("i.win", (player) => io.emit("winner", player));
+  socket.on('i.uno', (player) => io.emit('unoer', player))
 });
 
 

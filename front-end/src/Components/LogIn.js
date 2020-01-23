@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-const URLBase = 'http://10.185.2.163:3001'
+import { URLBase } from '../URLBase'
 
 class LogIn extends Component {
   state = {
