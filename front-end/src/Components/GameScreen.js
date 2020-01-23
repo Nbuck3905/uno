@@ -23,19 +23,6 @@ export default class GameScreen extends Component {
     playedCard: null
   };
 
-  handleColorSelect =  color => {
-    if(this.state.playedCard.type === 'wild'){
-      let playedCard = { ...this.state.playedCard, color: color }
-      this.setState({ playedCard: null })
-      return io.emit('wild.play', playedCard)
-    }
-    if(this.state.playedCard.type === '+4'){
-      let playedCard = { ...this.state.playedCard, color: color }
-      this.setState({ playedCard: null })
-      return io.emit('draw4.play', playedCard)
-    }
-  }
-
   componentDidMount() {
     this.setState({
       allCards: cards,
@@ -198,13 +185,13 @@ export default class GameScreen extends Component {
     if(this.state.player.user.id === this.state.turn.id){
       if(!this.state.discard){
         if(playedCard.type == 'wild'){
-          this.setState({
+          return this.setState({
             colorSelect: true,
             playedCard
           })
         }
         if(playedCard.type == '+4'){
-          this.setState({
+          return this.setState({
             colorSelect: true,
             playedCard
           })
@@ -223,13 +210,13 @@ export default class GameScreen extends Component {
       }
       if(drawAmount == 0){
         if(playedCard.type == 'wild'){
-          this.setState({
+          return this.setState({
             colorSelect: true,
             playedCard
           })
         }
         if(playedCard.type == '+4'){
-          this.setState({
+          return this.setState({
             colorSelect: true,
             playedCard
           })
@@ -249,7 +236,7 @@ export default class GameScreen extends Component {
       }
       if(playedCard.type == this.state.discard.type){
         if(playedCard.type == '+4'){
-          this.setState({
+          return this.setState({
             colorSelect: true,
             playedCard
           })
@@ -260,6 +247,19 @@ export default class GameScreen extends Component {
       }
     }
   };
+
+  handleColorSelect =  color => {
+    if(this.state.playedCard.type === 'wild'){
+      let playedCard = { ...this.state.playedCard, color: color }
+      this.setState({ playedCard: null })
+      return io.emit('wild.play', playedCard)
+    }
+    if(this.state.playedCard.type === '+4'){
+      let playedCard = { ...this.state.playedCard, color: color }
+      this.setState({ playedCard: null })
+      return io.emit('draw4.play', playedCard)
+    }
+  }
 
   winner = player => {
    io.emit('i.win', player)

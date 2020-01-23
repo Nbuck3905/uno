@@ -1,4 +1,5 @@
 import React from "react";
+const URLBase = 'http://10.185.2.163:3001'
 
 export default class SignUp extends React.Component {
   state = {
@@ -21,7 +22,7 @@ export default class SignUp extends React.Component {
 
   handleSignUp = e => {
     e.preventDefault();
-    fetch("http://localhost:3001/users", {
+    fetch(`${URLBase}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
