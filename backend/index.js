@@ -67,7 +67,13 @@ io.on("connection", async socket => {
     io.emit("creator.send", creator[0]);
   });
   socket.on("deal", () => io.emit("dealt"));
-  socket.on("card.drawn", card => io.emit("remove.card", card));
+  socket.on("cards.dealt", cards => io.emit("drawCards.new", cards));
+  socket.on('next.deal', (player) => io.emit('next.dealt', player))
+  socket.on('first.card.play', (playedCard) => io.emit('first.card.played', playedCard))
+  socket.on('draw1', (drawCards) => io.emit('drew1', drawCards))
+  socket.on('normal.play', (playedCard) => io.emit('normal.played', playedCard))
+  socket.on('skip.play', (playedCard) => io.emit('skip.played', playedCard))
+  socket.on('reverse.play', (playedCard) => io.emit('reverse.played', playedCard))
 });
 
 

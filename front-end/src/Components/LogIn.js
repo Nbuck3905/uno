@@ -33,8 +33,6 @@ class LogIn extends Component {
     })
       .then(res => res.json())
       .then(login => {
-        console.log(login.user);
-        console.log(login);
         if (login.error) {
           this.setState({ errorMessage: login.message });
         } else {
