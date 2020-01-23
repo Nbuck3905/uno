@@ -12,7 +12,7 @@ import JoinGame from "./Components/JoinGame";
 import Waiting from "./Components/Waiting";
 import GameScreen from "./Components/GameScreen";
 import { io } from "./Socket";
-const URLBase = 'http://10.185.2.163:3001'
+import { URLBase } from './URLBase'
 
 export default class App extends Component {
   state = {
@@ -258,6 +258,7 @@ export default class App extends Component {
               user={this.state.loggedInUser}
               game={this.state.currentGame}
               getCreator={this.getCreator}
+              handleHome={this.handleHome}
             />
           </div>
         );

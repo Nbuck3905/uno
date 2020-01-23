@@ -1,8 +1,0 @@
-if(playedCard.type == 'wild'){
-          this.setState({
-            colorSelect: true
-          }, () => {
-            //playedCard.color = selectedColor
-            return io.emit('wild.play', playedCard)
-          })
-        }

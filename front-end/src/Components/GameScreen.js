@@ -66,7 +66,7 @@ export default class GameScreen extends Component {
         player: {...this.state.player, cards: this.state.player.cards.filter(card => card.id != playedCard.id)},
         discard: playedCard,
         turn: (this.state.players.indexOf(player) + 1 >= this.state.players.length ? this.state.players[0] : this.state.players[this.state.players.indexOf(player) + 1])
-      }, () => this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null)
+      }, () => this.state.player.cards.length == 1 ? this.uno(this.state.player.user) : (this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null))
     })
     io.on('skip.played', (playedCard) => {
       let player = this.state.players.find(player => player.id === this.state.turn.id)
@@ -74,7 +74,7 @@ export default class GameScreen extends Component {
         player: {...this.state.player, cards: this.state.player.cards.filter(card => card.id != playedCard.id)},
         discard: playedCard,
         turn: (this.state.players.indexOf(player) + 1 == this.state.players.length ? this.state.players[1] : (this.state.players.indexOf(player) + 2 == this.state.players.length ? this.state.players[0] : this.state.players[this.state.players.indexOf(player) + 2]))
-      }, () => this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null)
+      }, () => this.state.player.cards.length == 1 ? this.uno(this.state.player.user) : (this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null))
     })
     io.on('reverse.played', (playedCard) => {
       let player = this.state.players.find(player => player.id === this.state.turn.id)
@@ -83,7 +83,7 @@ export default class GameScreen extends Component {
         discard: playedCard,
         turn: (this.state.players.indexOf(player) == 0 ? this.state.players[this.state.players.length -1] : this.state.players[this.state.players.indexOf(player) - 1]),
         players: this.state.players.reverse()
-      }, () => this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null)
+      }, () => this.state.player.cards.length == 1 ? this.uno(this.state.player.user) : (this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null))
     })
     io.on('draw2.played', (playedCard) => {
       let player = this.state.players.find(player => player.id === this.state.turn.id)
@@ -92,7 +92,7 @@ export default class GameScreen extends Component {
         discard: playedCard,
         turn: (this.state.players.indexOf(player) + 1 >= this.state.players.length ? this.state.players[0] : this.state.players[this.state.players.indexOf(player) + 1]),
         drawAmount: this.state.drawAmount + 2
-      }, () => this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null)
+      }, () => this.state.player.cards.length == 1 ? this.uno(this.state.player.user) : (this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null))
     })
     io.on('draw4.played', (playedCard) => {
       let player = this.state.players.find(player => player.id === this.state.turn.id)
@@ -102,7 +102,7 @@ export default class GameScreen extends Component {
         turn: (this.state.players.indexOf(player) + 1 >= this.state.players.length ? this.state.players[0] : this.state.players[this.state.players.indexOf(player) + 1]),
         drawAmount: this.state.drawAmount + 4,
         colorSelect: false
-      }, () => this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null)
+      }, () => this.state.player.cards.length == 1 ? this.uno(this.state.player.user) : (this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null))
     })
     io.on('wild.played', (playedCard) => {
       let player = this.state.players.find(player => player.id === this.state.turn.id)
@@ -111,9 +111,13 @@ export default class GameScreen extends Component {
         discard: playedCard,
         turn: (this.state.players.indexOf(player) + 1 >= this.state.players.length ? this.state.players[0] : this.state.players[this.state.players.indexOf(player) + 1]),
         colorSelect: false
-      }, () => this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null)
+      }, () => this.state.player.cards.length == 1 ? this.uno(this.state.player.user) : (this.state.player.cards.length == 0 ? this.winner(this.state.player.user) : null))
     })
-    io.on("winner", player => alert(`${player.username} wins`));
+    io.on('unoer', player => alert(`${player.username} has uno!`))
+    io.on("winner", player => {
+      alert(`${player.username} wins`) 
+      this.props.handleHome()
+    });
   }
 
   deal = () => {
@@ -259,6 +263,10 @@ export default class GameScreen extends Component {
       this.setState({ playedCard: null })
       return io.emit('draw4.play', playedCard)
     }
+  }
+
+  uno = player => {
+    io.emit('i.uno', player)
   }
 
   winner = player => {
