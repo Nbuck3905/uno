@@ -1,27 +1,17 @@
 import React from 'react'
 
 export default class ColorSelect extends React.Component{
-    state = {
-        color: ''
-    }
-
-    componentDidMount(){
-        this.setState({
-            color: (this.props.discard.color ? this.props.discard.color : 'red')
-        })
-    }
-
+    
     render(){
         return(
-            <div className="ui raised very padded text container form">
-                <form>
-                    <select value={this.state.color}>
-                        <option value="red">Red</option>
-                        <option value="yellow">Yellow</option>
-                        <option value="blue">Blue</option>
-                        <option value="green">Green</option>
-                    </select>
-                </form>
+            <div>
+                <div style={{height: '40vh'}}></div>
+                <div className="ui four item menu">
+                    <div onClick={() => this.props.handleColorSelect('red')} className='ui massive red button'>Red</div>
+                    <div onClick={() => this.props.handleColorSelect('yellow')} className='ui massive yellow button'>Yellow</div>
+                    <div onClick={() => this.props.handleColorSelect('blue')} className='ui massive blue button'>Blue</div>
+                    <div onClick={() => this.props.handleColorSelect('green')} className='ui massive green button'>Green</div>
+                </div>
             </div>
         )
     }

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import cards from "../cards";
 import GamePlay from "./GamePlay";
+import ColorSelect from './ColorSelect'
 import { io } from "../Socket";
 
 export default class GameScreen extends Component {
@@ -18,8 +19,22 @@ export default class GameScreen extends Component {
     turn: null,
     discard: null,
     drawAmount: 0,
-    colorSelect: false
+    colorSelect: false,
+    playedCard: null
   };
+
+  handleColorSelect =  color => {
+    if(this.state.playedCard.type === 'wild'){
+      let playedCard = { ...this.state.playedCard, color: color }
+      this.setState({ playedCard: null })
+      return io.emit('wild.play', playedCard)
+    }
+    if(this.state.playedCard.type === '+4'){
+      let playedCard = { ...this.state.playedCard, color: color }
+      this.setState({ playedCard: null })
+      return io.emit('draw4.play', playedCard)
+    }
+  }
 
   componentDidMount() {
     this.setState({
@@ -179,14 +194,16 @@ export default class GameScreen extends Component {
     if(this.state.player.user.id === this.state.turn.id){
       if(!this.state.discard){
         if(playedCard.type == 'wild'){
-          //color selector
-          //playedCard.color = selected color
-          return io.emit('wild.play', playedCard)
+          this.setState({
+            colorSelect: true,
+            playedCard
+          })
         }
         if(playedCard.type == '+4'){
-          //color selector
-          //playedCard.color = selected color
-          return io.emit('draw4.play', playedCard)
+          this.setState({
+            colorSelect: true,
+            playedCard
+          })
         }
         if(playedCard.type == '+2'){
           return io.emit('draw2.play', playedCard)
@@ -201,14 +218,16 @@ export default class GameScreen extends Component {
       }
       if(drawAmount == 0){
         if(playedCard.type == 'wild'){
-          //color selector
-          //playedCard.color = selected color
-          return io.emit('wild.play', playedCard)
+          this.setState({
+            colorSelect: true,
+            playedCard
+          })
         }
         if(playedCard.type == '+4'){
-          //color selector
-          //playedCard.color = selected color
-          return io.emit('draw4.play', playedCard)
+          this.setState({
+            colorSelect: true,
+            playedCard
+          })
         }
         if((playedCard.type == this.state.discard.type) || (playedCard.color == this.state.discard.color)){
           if(playedCard.type == '+2'){
@@ -225,9 +244,10 @@ export default class GameScreen extends Component {
       }
       if(playedCard.type == this.state.discard.type){
         if(playedCard.type == '+4'){
-          //color selector
-          //playedCard.color = selected color
-          return io.emit('draw4.play', playedCard)
+          this.setState({
+            colorSelect: true,
+            playedCard
+          })
         }
         if(playedCard.type == '+2'){
           return io.emit('draw2.play', playedCard)
@@ -245,15 +265,16 @@ export default class GameScreen extends Component {
     if (this.state.deal) {
       return (
         <div>
-          <GamePlay
-            drawCards={this.state.drawCards}
-            cards={this.state.player.cards}
-            turn={this.state.turn.username}
-            handlePlay={this.handlePlay}
-            discard={this.state.discard}
-            handleDraw={this.handleDraw}
-            colorSelect={this.state.colorSelect}
-          />
+          {this.state.colorSelect ? <ColorSelect handleColorSelect={this.handleColorSelect}/> : 
+            <GamePlay
+              drawCards={this.state.drawCards}
+              cards={this.state.player.cards}
+              turn={this.state.turn.username}
+              handlePlay={this.handlePlay}
+              discard={this.state.discard}
+              handleDraw={this.handleDraw}
+              colorSelect={this.state.colorSelect}
+            />}
         </div>
       );
     }
