@@ -8,6 +8,7 @@ export default class GamePlay extends React.Component {
   render() {
     return (
       <div>
+  <h1 style={{color: 'white'}}>Turn: {this.props.turn}</h1>
         <div
           style={{
             display: "flex",
@@ -16,7 +17,10 @@ export default class GamePlay extends React.Component {
             height: "40vh"
           }}
         >
-          <UnoBack />
+          <div onClick={this.props.handleDrawOne}>
+            <UnoBack />
+          </div>
+          <UnoCard {...this.props.discard}/>
         </div>
         <div
           style={{
@@ -26,9 +30,13 @@ export default class GamePlay extends React.Component {
             height: "40vh"
           }}
         >
-          {this.props.cards.map(card => (
-            <UnoCard {...card} />
-          ))}
+          {this.props.cards.map(card => {
+            return(
+              <div key={card.id} onClick={() => this.props.handlePlay(card)}>
+                <UnoCard {...card}/>
+              </div>
+            )
+          })}
         </div>
       </div>
     );
